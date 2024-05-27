@@ -4,7 +4,7 @@ from exts import db, mail
 from blueprints.auth import bp as auth_bp
 from blueprints.qa import bp as qa_bp
 from flask_migrate import Migrate
-from model import UserModel, EmailCaptchaModel
+from models import UserModel, EmailCaptchaModel
 
 
 app = Flask(__name__)
