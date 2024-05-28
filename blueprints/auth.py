@@ -23,6 +23,7 @@ def login():
             user = UserModel.query.filter_by(email=email).first()
             if user:
                 if check_password_hash(user.password, password):
+                    session['user_id'] = user.id
                     return redirect(url_for("qa.index"))
                 else:
                     print("密码错误！")
@@ -33,6 +34,12 @@ def login():
         else:
             print(form.errors)
             return redirect(url_for("auth.login"))
+
+
+@bp.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/register", methods=['GET', 'POST'])
@@ -52,9 +59,6 @@ def register():
         else:
             print(form.errors)
             return redirect(url_for("auth.register"))
-
-
-
 
 
 @bp.route("/captcha/email")

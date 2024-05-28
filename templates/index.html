@@ -14,7 +14,7 @@
                     <img class="side-question-avatar" src="{{ url_for('static',filename="images/zhiliao.png") }}" alt="">
                 </div>
                 <div class="question-main">
-                    <p class="question-title"><a href="#">{{ question.title }}</a></p>
+                    <p class="question-title"><a href="{{ url_for('qa.qa_detail', qa_id=question.id) }}">{{ question.title }}</a></p>
                     <p class="question-content">{{ question.content }}</p>
                     <p class="question-detail">
                         <span class="question-author">{{ question.author.username }}</span>
