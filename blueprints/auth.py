@@ -1,22 +1,60 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from exts import mail, db
 from flask_mail import Message
 import random
-from model import EmailCaptchaModel
+from models import EmailCaptchaModel, UserModel
+from .forms import RegisterForm, LoginForm
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 random.seed()
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@bp.route("/login")
+@bp.route("/login", methods=['GET', 'POST'])
 def login():
-    return "login"
+    if request.method == 'GET':
+        return render_template("login.html")
+    else:
+        form = LoginForm(request.form)
+        if form.validate():
+            email = form.email.data
+            password = form.password.data
+            user = UserModel.query.filter_by(email=email).first()
+            if user:
+                if check_password_hash(user.password, password):
+                    return redirect(url_for("qa.index"))
+                else:
+                    print("密码错误！")
+                    return redirect(url_for("auth.login"))
+            else:
+                print("用户不存在！")
+                return redirect(url_for("auth.login"))
+        else:
+            print(form.errors)
+            return redirect(url_for("auth.login"))
 
 
-@bp.route("/register")
+@bp.route("/register", methods=['GET', 'POST'])
 def register():
-    return render_template("regist.html")
+    if request.method == 'GET':
+        return render_template("regist.html")
+    else:
+        form = RegisterForm(request.form)
+        if form.validate():
+            email = form.email.data
+            username = form.username.data
+            password = form.password.data
+            user = UserModel(username=username, email=email, password=generate_password_hash(password))
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for("auth.login"))
+        else:
+            print(form.errors)
+            return redirect(url_for("auth.register"))
+
+
+
 
 
 @bp.route("/captcha/email")
